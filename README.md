@@ -29,7 +29,7 @@ will show up.
 You can also call the function from python. There is a full working example in [this notebook](demo/BBii_Decon_2D_2021.ipynb).
 
 ```
-from bbii_decon import biii
+from bbii_decon import bbii
 
 bbii(PSF, image, number_of_iterations = 15, tau = 1.0e-08, rho = 0.98)
 ```
