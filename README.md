@@ -26,12 +26,12 @@ will show up.
 
 ## Usage from python
 
-You can also call the function from python, see a full working example in [this notebook](demo/BBii_Decon_2D_2021.ipynb)
+You can also call the function from python. There is a full working example in [this notebook](demo/BBii_Decon_2D_2021.ipynb).
 
 ```
 from bbii_decon import biii
 
-
+bbii(PSF, image, number_of_iterations = 15, tau = 1.0e-08, rho = 0.98)
 ```
 
 
@@ -60,10 +60,43 @@ You can install `bbii-decon` via [pip]:
     pip install bbii-decon
 
 
+## Installation for developers
 
-To install latest development version :
+Clone the github repository:
 
-    pip install git+https://github.com/gdellaire/bbii-decon.git
+```
+conda install git
+
+git clone https://github.com/gdellaire/BBii-Decon.git
+
+cd BBii-Decon
+
+pip install -e .
+```
+
+## Deployment to pypi
+
+For deploying the plugin to the python package index (pypi), one needs a [pypi user account](https://pypi.org/account/register/) 
+first. For deploying the plugin to pypi, one needs to install some tools:
+
+```
+python -m pip install --user --upgrade setuptools wheel
+python -m pip install --user --upgrade twine
+```
+
+The following command allows us to package the souce code as a python wheel. Make sure that the 'dist' and 'build' folders are deleted before doing this:
+
+```
+python setup.py sdist bdist_wheel
+```
+
+This command ships the just generated to pypi:
+
+```
+python -m twine upload --repository pypi dist/*
+```
+
+[Read more about distributing your python package via pypi](https://realpython.com/pypi-publish-python-package/#publishing-to-pypi).
 
 
 ## Contributing
