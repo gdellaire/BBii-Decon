@@ -1,6 +1,7 @@
 
 __version__ = "0.0.1"
-import numpy as np
+
+import numpy
 from napari_plugin_engine import napari_hook_implementation
 
 # This is the actual plugin function, where we export our function
@@ -14,18 +15,30 @@ def napari_experimental_provide_function():
 
 # This is the function we call from napari. The type annotations and default values allow to build a user interface
 # automatically.
-def bbii_deconvolution(
-        PSF: "napari.types.ImageData",
-        blurry_image: "napari.types.ImageData",
-        number_of_iterations: int = 10,
-        tau: float = 1.0e-08,
-        rho: float = 0.98
-) -> "napari.types.ImageData":
-    return bbii(PSF, blurry_image, number_of_iterations, tau, rho)[0]
+try:
+    import cupy
+    def bbii_deconvolution(
+            PSF: "napari.types.ImageData",
+            blurry_image: "napari.types.ImageData",
+            number_of_iterations: int = 10,
+            tau: float = 1.0e-08,
+            rho: float = 0.98,
+            use_gpu: bool = False
+    ) -> "napari.types.ImageData":
+        return bbii(PSF, blurry_image, number_of_iterations, tau, rho, use_gpu)[0]
+except ImportError:
+    def bbii_deconvolution(
+            PSF: "napari.types.ImageData",
+            blurry_image: "napari.types.ImageData",
+            number_of_iterations: int = 10,
+            tau: float = 1.0e-08,
+            rho: float = 0.98
+    ) -> "napari.types.ImageData":
+        return bbii(PSF, blurry_image, number_of_iterations, tau, rho)[0]
 
 
 # BBii function; Source: Fraser, Arnold, Dellaire 2014 https://ieeexplore.ieee.org/abstract/document/6816842
-def bbii(PSF, blurry_image, number_of_iterations, tau, rho):
+def bbii(PSF, blurry_image, number_of_iterations, tau, rho, use_gpu=False):
     """The projected Barzilai-Borwein method of image deconvolution utilizing infeasible iterates (BBii-Decon),
     utilizes Barzilai-Borwein (BB) or projected BB (PBB) method and enforces a nonnegativity constraint, but allows for
     infeasible iterates between projections. This algorithm (BBii) results in faster convergence than the basic PBB
@@ -43,6 +56,8 @@ def bbii(PSF, blurry_image, number_of_iterations, tau, rho):
         initial threshold for when to project (tau < 0) -- should this really be less than 0??
     rho: float
         scaling factor by which tau decreases over time (0 <= rho <= 1)
+    use_gpu: bool
+        Use GPU-acceleration using cupy
 
     Returns
     -------
@@ -56,9 +71,23 @@ def bbii(PSF, blurry_image, number_of_iterations, tau, rho):
     """
     from pypher.pypher import psf2otf
 
+    import numpy
+    if use_gpu:
+        import cupy as cp
+        np = cp
+    else:
+        np = numpy
+
+
     # convert to numpy arrays
-    PSF = np.array(PSF)
-    b = np.array(blurry_image)
+    PSF = numpy.array(PSF)
+    b = numpy.array(blurry_image)
+    K = psf2otf(PSF, b.shape)
+
+    PSF = np.asarray(PSF)
+    b = np.asarray(b)
+    K = np.asarray(K)
+
     iter = number_of_iterations
 
     numel_b = 1  # number of elements in b (use this later)
@@ -73,7 +102,6 @@ def bbii(PSF, blurry_image, number_of_iterations, tau, rho):
     r = np.zeros([iter])
     med = np.zeros([iter])
 
-    K = psf2otf(PSF, b.shape)
 
     F = np.fft.fftn(f)
     B = np.fft.fftn(b)
@@ -131,4 +159,13 @@ def bbii(PSF, blurry_image, number_of_iterations, tau, rho):
         if k == iter - 1:  # always project on last iteration
             f[f < 0] = 0  # so output solution is feasible
 
-    return [f, alpha, proj]
+    if numpy == np:
+        return [f, alpha, proj]
+    else:
+        import warnings
+        warnings.warn("Converting to CPU")
+        return [
+            numpy.asarray(f.get()),
+            numpy.asarray(alpha.get()),
+            numpy.asarray(proj.get())]
+
