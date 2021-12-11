@@ -162,8 +162,6 @@ def bbii(PSF, blurry_image, number_of_iterations, tau, rho, use_gpu=False):
     if numpy == np:
         return [f, alpha, proj]
     else:
-        import warnings
-        warnings.warn("Converting to CPU")
         return [
             numpy.asarray(f.get()),
             numpy.asarray(alpha.get()),
