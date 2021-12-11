@@ -84,6 +84,7 @@ def bbii(PSF, blurry_image, number_of_iterations, tau, rho, use_gpu=False):
     b = numpy.array(blurry_image)
     K = psf2otf(PSF, b.shape)
 
+    # from here we use "np", which may be "numpy" or "cupy" depending on if GPU-acceleration is off or on
     PSF = np.asarray(PSF)
     b = np.asarray(b)
     K = np.asarray(K)
