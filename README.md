@@ -18,8 +18,9 @@ The first implementation shown here is for 2D deconvolution using a known 2D PSF
 
 ### GPU-acceleration
 
-If processing takes too long, acceleration using graphics processing units (GPUs) may make sense, especially for processing 3D data. This plugin 
-supports accelerated processing using the [cupy](https://cupy.dev) library. To make use of it, please follow 
+If processing takes too long, acceleration using graphics processing units (GPUs) may make sense, especially for processing 3D data. (Note: At this time BBii-Decon is optimized for 2D deconvolution, with a 3D implementation planned in future). 
+
+This plugin supports accelerated processing using the [cupy](https://cupy.dev) library. To make use of it, please follow 
 [the instructions](https://docs.cupy.dev/en/stable/install.html#installing-cupy-from-conda-forge) to install cupy. 
 Installation may look like this:
 ```
