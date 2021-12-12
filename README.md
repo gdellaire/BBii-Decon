@@ -16,13 +16,30 @@ The code represented is based on the original BBii algorithm written in MatLab b
 
 The first implementation shown here is for 2D deconvolution using a known 2D PSF of 256 X 256 pixels, and images of at least 256 pixels in one dimension. One file implements just the deconvolution of a blurred image, while the second file contains a modification of the BBii-Decon algorithm that has a built in heuristic for measuring image reconstruction error relative to a ground truth image.
 
+### GPU-acceleration
+
+If processing takes too long, acceleration using graphics processing units (GPUs) may make sense, especially for processing 3D data. This plugin 
+supports accelerated processing using the [cupy](https://cupy.dev) library. To make use of it, please follow 
+[the instructions](https://docs.cupy.dev/en/stable/install.html#installing-cupy-from-conda-forge) to install cupy. 
+Installation may look like this:
+```
+conda create --name cupy_p38 python=3.8
+conda activate cupy_p38
+conda install -c conda-forge cupy cudatoolkit=10.2
+```
+
+If cupy installation worked out, you will find another checkbox in the user interface. By activating it, processing 
+should become faster by factor 5-10, depending on processed image data and use GPU hardware.
+
+![img.png](https://github.com/gdellaire/BBii-Decon/raw/main/demo/use_GPU_checkbox.png)
+
 ## Usage - napari
 
 You can use the BBii deconvolution from within napari by clicking the menu `Plugins > bbii-decon > bbii deconvolution`. 
 In the dialog, select the PSF, the image to process (a) and click on `Run`. After a moment, the deconvolved image (b) 
 will show up.
 
-![img.png](demo/screenshot_napari.png)
+![img.png](https://github.com/gdellaire/BBii-Decon/raw/main/demo/screenshot_napari.png)
 
 ## Usage from python
 
