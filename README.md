@@ -1,4 +1,4 @@
-# BBii-decon
+# BBii-Decon
 
 [![License](https://img.shields.io/pypi/l/bbii-decon.svg?color=green)](https://github.com/gdellaire/bbii-decon/raw/main/LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/bbii-decon.svg?color=green)](https://pypi.org/project/bbii-decon)
